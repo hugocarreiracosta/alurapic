@@ -5,19 +5,20 @@ import { PhotoListComponent } from "./photos/photo-list/photo-list.component";
 import { PhotoFormComponent } from "./photos/photo-form/photo-form.component";
 import { NotFoundComponent } from "./errors/not-found/not-found.component";
 import { PhotoListResolver } from './photos/photo-list/photo-list.resolver';
-import { SigninComponent } from './home/signin/signin.component';
-import { AuthGuard } from './core/auth/auth.guard';
-import { SignUpComponent } from './home/singup/signup.component';
+import { AuthGuard } from "./core/auth/auth.guard";
+import { PhotoDetailsComponent } from "./photos/photo-details/photo-details.component";
+
+
 
 const routes: Routes = [
     {
         path: '',
-        component: SigninComponent,
-        canActivate: [AuthGuard]
+        pathMatch: 'full',
+        redirectTo: 'home'
     },
     {
-        path: 'signup',
-        component: SignUpComponent
+        path: 'home',
+        loadChildren: './home/home.module#HomeModule'
     },
     { 
         path: 'user/:userName',
@@ -28,7 +29,12 @@ const routes: Routes = [
     },
     {
         path: 'p/add',
-        component: PhotoFormComponent
+        component: PhotoFormComponent,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'p/:photoId',
+        component: PhotoDetailsComponent
     },
     {
         path: '**',
@@ -37,7 +43,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {useHash: true})],
   exports: [RouterModule]
 })
 export class AppRountingModule {}

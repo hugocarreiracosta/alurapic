@@ -3,8 +3,11 @@ import { Injectable } from "@angular/core";
 
 import { Photo } from "./photo";
 import { PhotoComment } from "./photo-comment";
+import { map, catchError } from "rxjs/operators";
+import { of, throwError } from "rxjs";
+import { environment } from '../../../environments/environment';
 
-const API = 'http://localhost:3000';
+const API = environment.ApiUrl
 
 @Injectable({ providedIn: 'root' })
 export class PhotoService {
@@ -32,7 +35,14 @@ export class PhotoService {
         formData.append('imageFile', file);
 
 
-        return this.http.post(API + '/photos/upload', formData)
+        return this.http.post(
+            API + '/photos/upload',
+            formData,
+            {
+                observe: 'events',
+                reportProgress: true
+            }
+        )
     }
 
     findById(id: number) {
@@ -56,4 +66,16 @@ export class PhotoService {
         return this.http.delete(API + '/photos/'+ photoId)
     }
 
+    like(photoId: number){ 
+
+        return this.http.post(
+            API + '/photos/' + photoId + '/like', {}, { observe: 'response'}
+        )
+        .pipe(map(res => true))
+        .pipe(catchError(err => {
+            return err.status == '304' ? of(false) : throwError(err);
+        }));
+    }
+
 }
+
